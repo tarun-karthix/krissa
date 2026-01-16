@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You | The Full Canopy Sorry</title>
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff0f3;
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* --- TREE PAGE --- */
+        .container {
+            position: relative;
+            width: 600px; 
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        svg { width: 100%; height: 100%; z-index: 2; }
+
+        .branch {
+            fill: none; stroke: #3d2b1f; stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+            animation: growBranch 3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes growBranch { to { stroke-dashoffset: 0; } }
+
+        .blossom {
+            transform: scale(0); transform-origin: center;
+            animation: pop 0.8s cubic-bezier(0.17, 0.67, 0.83, 1.5) forwards;
+        }
+        @keyframes pop { to { transform: scale(1); } }
+
+        .girl {
+            position: absolute; bottom: 40px; left: -100px; width: 45px; height: 90px;
+            z-index: 50; cursor: pointer; display: none;
+        }
+        .is-walking { display: block; animation: moveAcross 4s linear forwards; }
+        @keyframes moveAcross { from { left: -100px; } to { left: 45%; } }
+
+        .girl-body { position: relative; width: 100%; height: 100%; }
+        .bob-anim { animation: walkBob 0.5s infinite alternate ease-in-out; }
+        @keyframes walkBob { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+
+        .hair-back { width: 28px; height: 40px; background: #2d2d2d; border-radius: 10px; position: absolute; top: 10px; left: 8.5px; z-index: 1; }
+        .hair-top { width: 24px; height: 15px; background: #2d2d2d; border-radius: 12px 12px 0 0; position: absolute; top: 7px; left: 10.5px; z-index: 4; }
+        .head { width: 20px; height: 20px; background: #ffe0bd; border-radius: 50%; position: absolute; top: 10px; left: 12.5px; z-index: 3; }
+        .dress { width: 38px; height: 50px; background: #ff4d6d; clip-path: polygon(50% 0%, 100% 100%, 0% 100%); border-radius: 12px; position: absolute; bottom: 12px; left: 3.5px; z-index: 2; }
+        
+        .leg { width: 6px; height: 15px; background: #ffe0bd; position: absolute; bottom: 0; border-radius: 3px; }
+        .leg-left { left: 12px; } .leg-right { left: 26px; }
+        .swing-l { animation: legSwing 0.5s infinite alternate ease-in-out; }
+        .swing-r { animation: legSwing 0.5s infinite alternate-reverse ease-in-out; }
+        @keyframes legSwing { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+
+        .shake-active { animation: shakeTree 0.4s ease-in-out infinite; transform-origin: bottom center; }
+        @keyframes shakeTree { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-1.5deg); } 75% { transform: rotate(1.5deg); } }
+
+        .sorry-letter { position: absolute; color: #ad1457; font-weight: 900; font-size: 38px; pointer-events: none; z-index: 100; text-shadow: 2px 2px white; animation: petalFall 4s ease-in forwards; }
+        @keyframes petalFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(80vh) rotate(360deg); opacity: 0; } }
+
+        #hint { position: absolute; top: 40px; color: #ff4d6d; font-weight: bold; opacity: 0; transition: 1s; }
+        .hidden { display: none !important; }
+
+        #nextBtn {
+            position: fixed; bottom: 40px; right: 40px; padding: 15px 35px;
+            background: #ff4d6d; color: white; border: none; border-radius: 30px;
+            font-size: 18px; font-weight: bold; cursor: pointer; z-index: 200;
+        }
+
+        /* --- ENVELOPE SECTION --- */
+        .envelope-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff0f3; display: flex; justify-content: center; align-items: center; z-index: 1000;
+        }
+
+        .envelope-wrapper {
+            position: relative; width: 320px; height: 220px;
+            background: #ffb7c5; border-radius: 0 0 10px 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); cursor: pointer;
+            transition: transform 0.8s ease-in-out;
+        }
+
+        .envelope-front {
+            position: absolute; bottom: 0; width: 100%; height: 100%;
+            background: #ffb7c5; z-index: 10; border-radius: 0 0 10px 10px;
+            clip-path: polygon(0 0, 50% 50%, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .envelope-wrapper::before {
+            content: ""; position: absolute; top: 0; left: 0;
+            border-left: 160px solid transparent; border-right: 160px solid transparent;
+            border-top: 110px solid #ff8da1; transform-origin: top;
+            transition: transform 0.6s ease; z-index: 15;
+        }
+
+        .sticker {
+            position: absolute; top: 85px; left: 50%; transform: translateX(-50%);
+            z-index: 16; transition: opacity 0.3s; text-align: center;
+        }
+        .sticker .heart { color: white; font-size: 30px; }
+        .sticker .label { color: #ad1457; font-weight: bold; font-size: 14px; margin-top: 5px; }
+
+        .envelope-wrapper.open::before { transform: rotateX(180deg); z-index: 1; }
+        .envelope-wrapper.open .sticker { opacity: 0; }
+
+        .letter-content {
+            position: absolute; top: 10px; left: 10px; 
+            width: 300px; height: 200px; background: white; 
+            padding: 25px; border-radius: 5px; box-sizing: border-box;
+            transition: transform 1s 0.6s ease-in-out, z-index 0.1s 1.1s; 
+            z-index: 5; text-align: center; display: flex; 
+            flex-direction: column; justify-content: space-between; align-items: center;
+        }
+
+        /* Pulled up and shifted to front layer */
+        .envelope-wrapper.open .letter-content { transform: translateY(-200px); z-index: 20; }
+        .envelope-wrapper.open { transform: translateY(80px); }
+
+        /* Buttons hidden initially */
+        .choice-btns { 
+            display: flex; gap: 15px; width: 100%; justify-content: center; 
+            opacity: 0; transition: opacity 0.5s 1.5s; pointer-events: none; 
+        }
+        .envelope-wrapper.open .choice-btns { opacity: 1; pointer-events: auto; }
+
+        .yes-btn { background: #ff4d6d; color: white; padding: 12px 25px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; }
+        .no-btn { background: #eee; color: #555; padding: 12px 25px; border-radius: 20px; border: none; font-weight: bold; position: relative; }
+
+        /* --- FINAL SCREEN --- */
+        .final-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #fff0f3; z-index: 2000; display: flex;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .final-text { color: #ff4d6d; font-size: 3rem; z-index: 3000; text-shadow: 2px 2px white; margin-bottom: 20px; text-align: center; }
+        .photo-table { position: absolute; width: 100%; height: 100%; top: 0; left: 0; overflow: hidden; }
+        .falling-photo {
+            position: absolute; width: 150px; padding: 10px 10px 30px 10px; background: white;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); top: -250px;
+            transition: transform 2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="hint">Tap her to shake the tree</div>
+
+    <div class="container" id="treePage">
+        <svg viewBox="0 0 300 300" id="treeSvg">
+            <path class="branch" d="M150,290 Q170,220 150,150" style="stroke-width: 14;" />
+            <path class="branch" d="M155,200 Q100,180 60,130" style="stroke-width: 8; animation-delay: 0.5s;" />
+            <path class="branch" d="M150,150 Q230,140 260,80" style="stroke-width: 8; animation-delay: 0.8s;" />
+            <path class="branch" d="M150,150 Q140,80 120,50" style="stroke-width: 7; animation-delay: 1.1s;" />
+            <g id="bloomContainer"></g>
+        </svg>
+        <div class="girl" id="girl">
+            <div class="girl-body bob-anim" id="girlBody">
+                <div class="hair-back"></div><div class="head"></div><div class="hair-top"></div><div class="dress"></div>
+                <div class="leg leg-left swing-l"></div><div class="leg leg-right swing-r"></div>
+            </div>
+        </div>
+        <button id="nextBtn" class="hidden" onclick="showEnvelope()">Next →</button>
+    </div>
+
+    <div id="envelopePage" class="envelope-container hidden">
+        <div class="envelope-wrapper" id="envelope" onclick="this.classList.add('open')">
+            <div class="sticker">
+                <div class="heart">❤</div>
+                <div class="label">Open Me</div>
+            </div>
+            <div class="envelope-front"></div>
+            <div class="letter-content">
+                <div style="margin-top: 5px;">
+                    <h3 style="color:#ff4d6d; margin: 0 0 10px 0;">Dear Krissa...</h3>
+                    <p style="font-size: 15px; line-height: 1.4; color: #444;">I put my heart into this because I'm truly sorry. Our friendship means the world to me. 🌸</p>
+                </div>
+                <div>
+                    <p style="margin: 0 0 15px 0;"><strong>Do you accept?</strong></p>
+                    <div class="choice-btns">
+                        <button class="yes-btn" onclick="showFinale('yes'); event.stopPropagation();">Yes</button>
+                        <button class="no-btn" id="noBtn" onmouseover="dodgeNo()" onclick="event.stopPropagation();">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="finalScreen" class="final-screen hidden">
+        <h1 id="finalMsg" class="final-text"></h1>
+        <div id="photoTable" class="photo-table"></div>
+    </div>
+
+    <script>
+        const girl = document.getElementById('girl');
+        const treeSvg = document.getElementById('treeSvg');
+        const bloomContainer = document.getElementById('bloomContainer');
+        const flowerColors = ['#ff4d6d', '#ffb7c5', '#ffc0cb', '#ff8da1'];
+
+        function populateTree() {
+            const clusters = [{x: 60, y: 130}, {x: 260, y: 80}, {x: 120, y: 50}, {x: 200, y: 70}, {x: 150, y: 150}];
+            for (let i = 0; i < 220; i++) {
+                const cluster = clusters[Math.floor(Math.random() * clusters.length)];
+                const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                dot.setAttribute("cx", cluster.x + (Math.random() - 0.5) * 100);
+                dot.setAttribute("cy", cluster.y + (Math.random() - 0.5) * 100);
+                dot.setAttribute("r", Math.random() * 4 + 2);
+                dot.setAttribute("fill", flowerColors[Math.floor(Math.random() * flowerColors.length)]);
+                dot.setAttribute("class", "blossom");
+                dot.style.animationDelay = (0.5 + Math.random() * 2) + "s";
+                bloomContainer.appendChild(dot);
+            }
+        }
+        populateTree();
+
+        setTimeout(() => {
+            girl.classList.add('is-walking');
+            setTimeout(() => {
+                document.querySelectorAll('.leg').forEach(l => l.classList.remove('swing-l', 'swing-r'));
+                document.getElementById('girlBody').classList.remove('bob-anim');
+                document.getElementById('hint').style.opacity = '1';
+            }, 4000);
+        }, 3500);
+
+        girl.addEventListener('click', () => {
+            treeSvg.classList.add('shake-active');
+            document.getElementById('hint').style.opacity = '0';
+            "SORRY".split('').forEach((char, i) => {
+                setTimeout(() => {
+                    const el = document.createElement('div');
+                    el.className = 'sorry-letter'; el.innerText = char;
+                    el.style.left = (window.innerWidth / 2 - 150 + (i * 60)) + 'px';
+                    el.style.top = (window.innerHeight / 2 - 180) + 'px';
+                    document.body.appendChild(el);
+                    setTimeout(() => el.remove(), 4000);
+                }, i * 400);
+            });
+            setTimeout(() => document.getElementById('nextBtn').classList.remove('hidden'), 2000);
+            setTimeout(() => treeSvg.classList.remove('shake-active'), 3000);
+        });
+
+        function showEnvelope() {
+            document.getElementById('treePage').classList.add('hidden');
+            document.getElementById('envelopePage').classList.remove('hidden');
+        }
+
+        function dodgeNo() {
+            const btn = document.getElementById('noBtn');
+            btn.style.position = 'fixed';
+            btn.style.left = Math.random() * 70 + 15 + '%';
+            btn.style.top = Math.random() * 70 + 15 + '%';
+        }
+
+        function showFinale(ans) {
+    document.getElementById('envelopePage').classList.add('hidden');
+    document.getElementById('finalScreen').classList.remove('hidden');
+    document.getElementById('finalMsg').innerText = (ans === 'yes') ? "AWWWWW, I love you" : "I Still Love you";
+    
+    const container = document.getElementById('photoTable');
+
+    // CHANGE THESE THREE VARIABLES:
+    const username = "tarun-karthix"; 
+    const repo = "krissa";
+    const folder = "images"; 
+
+    // This creates the list of 45 links for you automatically
+    const photos = Array.from({length: 45}, (_, i) => 
+        `https://raw.githubusercontent.com/${username}/${repo}/main/${folder}/${i + 1}.jpg`
+    );
+
+    photos.forEach((url, i) => {
+        setTimeout(() => {
+            const img = document.createElement('img');
+            img.src = url; 
+            img.className = 'falling-photo';
+            img.style.left = (Math.random() * 80 + 5) + '%';
+            container.appendChild(img);
+            
+            setTimeout(() => {
+                const landY = (window.innerHeight * 0.1) + (Math.random() * (window.innerHeight * 0.6));
+                img.style.transform = `translateY(${landY + 300}px) rotate(${Math.random() * 40 - 20}deg)`;
+            }, 100);
+        }, i * 1200); // Dropping every 1.2 seconds so it's a bit faster
+    });
+}
+    </script>
+</body>
+</html>
